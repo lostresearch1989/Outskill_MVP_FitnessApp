@@ -36,44 +36,124 @@ function AppContent() {
   // Mock data for demonstration
   useEffect(() => {
     if (user) {
-      // Check if user needs onboarding (mock check)
-      const hasProfile = localStorage.getItem(`profile_${user.id}`);
-      if (!hasProfile) {
-        setNeedsOnboarding(true);
-      } else {
-        const savedProfile = JSON.parse(hasProfile);
-        setUserProfile(savedProfile);
-        setNeedsOnboarding(false);
-        
-        // Load activities
-        const savedActivities = localStorage.getItem(`activities_${user.id}`);
-        if (savedActivities) {
-          setActivities(JSON.parse(savedActivities));
+      // Load user data from localStorage
+      const loadUserData = () => {
+        try {
+          // Check if user needs onboarding
+          const hasProfile = localStorage.getItem(`profile_${user.id}`);
+          if (!hasProfile) {
+            setNeedsOnboarding(true);
+            return;
+          }
+
+          // Load profile
+          const savedProfile = JSON.parse(hasProfile);
+          setUserProfile(savedProfile);
+          setNeedsOnboarding(false);
+          
+          // Load activities
+          const savedActivities = localStorage.getItem(`activities_${user.id}`);
+          if (savedActivities) {
+            const activities = JSON.parse(savedActivities);
+            setActivities(activities);
+          }
+          
+          // Load baseline data
+          const savedBaseline = localStorage.getItem(`baseline_${user.id}`);
+          if (savedBaseline) {
+            const baseline = JSON.parse(savedBaseline);
+            setBaseline(baseline);
+          }
+          
+          // Load fitness targets
+          const savedTargets = localStorage.getItem(`targets_${user.id}`);
+          if (savedTargets) {
+            const targets = JSON.parse(savedTargets);
+            setFitnessTargets(targets);
+          }
+          
+          // Load personalized plan
+          const savedPlan = localStorage.getItem(`plan_${user.id}`);
+          if (savedPlan) {
+            const plan = JSON.parse(savedPlan);
+            setPersonalizedPlan(plan);
+          }
+          
+          // Load progress entries
+          const savedProgress = localStorage.getItem(`progress_${user.id}`);
+          if (savedProgress) {
+            const progress = JSON.parse(savedProgress);
+            setProgressEntries(progress);
+          }
+        } catch (error) {
+          console.error('Error loading user data:', error);
+          // If there's an error loading data, reset to onboarding
+          setNeedsOnboarding(true);
         }
-        
-        // Load baseline data
-        const savedBaseline = localStorage.getItem(`baseline_${user.id}`);
-        if (savedBaseline) {
-          setBaseline(JSON.parse(savedBaseline));
-        }
-        
-        // Load fitness targets
-        const savedTargets = localStorage.getItem(`targets_${user.id}`);
-        if (savedTargets) {
-          setFitnessTargets(JSON.parse(savedTargets));
-        }
-        
-        // Load personalized plan
-        const savedPlan = localStorage.getItem(`plan_${user.id}`);
-        if (savedPlan) {
-          setPersonalizedPlan(JSON.parse(savedPlan));
-        }
-        
-        // Load progress entries
-        const savedProgress = localStorage.getItem(`progress_${user.id}`);
-        if (savedProgress) {
-          setProgressEntries(JSON.parse(savedProgress));
-        }
+      };
+
+      // Small delay to ensure user state is stable
+      const timeoutId = setTimeout(loadUserData, 100);
+      return () => clearTimeout(timeoutId);
+    } else {
+      // Clear all state when user logs out
+      setUserProfile(null);
+      setNeedsOnboarding(false);
+      setActivities([]);
+      setBaseline(null);
+      setFitnessTargets(null);
+      setPersonalizedPlan(null);
+      setProgressEntries([]);
+      setActiveTab('dashboard');
+      setShowActivityLogger(false);
+      setShowBaselineAssessment(false);
+      setShowGoalSetting(false);
+      setShowProgressTracker(false);
+    }
+  }, [user]);
+
+  // Add effect to handle data persistence improvements
+  useEffect(() => {
+    if (user && userProfile) {
+      // Ensure profile is always saved when updated
+      localStorage.setItem(`profile_${user.id}`, JSON.stringify(userProfile));
+    }
+  }, [user, userProfile]);
+
+  useEffect(() => {
+    if (user && activities.length > 0) {
+      // Save activities whenever they change
+      localStorage.setItem(`activities_${user.id}`, JSON.stringify(activities));
+    }
+  }, [user, activities]);
+
+  useEffect(() => {
+    if (user && baseline) {
+      // Save baseline whenever it changes
+      localStorage.setItem(`baseline_${user.id}`, JSON.stringify(baseline));
+    }
+  }, [user, baseline]);
+
+  useEffect(() => {
+    if (user && fitnessTargets) {
+      // Save fitness targets whenever they change
+      localStorage.setItem(`targets_${user.id}`, JSON.stringify(fitnessTargets));
+    }
+  }, [user, fitnessTargets]);
+
+  useEffect(() => {
+    if (user && personalizedPlan) {
+      // Save personalized plan whenever it changes
+      localStorage.setItem(`plan_${user.id}`, JSON.stringify(personalizedPlan));
+    }
+  }, [user, personalizedPlan]);
+
+  useEffect(() => {
+    if (user && progressEntries.length > 0) {
+      // Save progress entries whenever they change
+      localStorage.setItem(`progress_${user.id}`, JSON.stringify(progressEntries));
+    }
+  }, [user, progressEntries]);
       }
     }
   }, [user]);
@@ -103,24 +183,20 @@ function AppContent() {
 
     const updatedActivities = [newActivity, ...activities];
     setActivities(updatedActivities);
-    localStorage.setItem(`activities_${user!.id}`, JSON.stringify(updatedActivities));
     setShowActivityLogger(false);
   };
 
   const handleSaveBaseline = (baselineData: BaselineData) => {
-    localStorage.setItem(`baseline_${user!.id}`, JSON.stringify(baselineData));
     setBaseline(baselineData);
     setShowBaselineAssessment(false);
   };
 
   const handleSaveTargets = (targetsData: FitnessTargets) => {
-    localStorage.setItem(`targets_${user!.id}`, JSON.stringify(targetsData));
     setFitnessTargets(targetsData);
     
     // Generate personalized plan if we have baseline data
     if (baseline) {
       const plan = generatePersonalizedPlan(baseline, targetsData, userProfile?.disability_type);
-      localStorage.setItem(`plan_${user!.id}`, JSON.stringify(plan));
       setPersonalizedPlan(plan);
     }
     
@@ -138,7 +214,6 @@ function AppContent() {
       new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime()
     );
     setProgressEntries(updatedEntries);
-    localStorage.setItem(`progress_${user!.id}`, JSON.stringify(updatedEntries));
   };
 
   const handleUpdateMilestone = (milestoneIndex: number, completed: boolean) => {
@@ -148,7 +223,6 @@ function AppContent() {
     updatedPlan.milestones[milestoneIndex].completed = completed;
     updatedPlan.milestones[milestoneIndex].completed_at = completed ? new Date().toISOString() : undefined;
     
-    localStorage.setItem(`plan_${user!.id}`, JSON.stringify(updatedPlan));
     setPersonalizedPlan(updatedPlan);
   };
 

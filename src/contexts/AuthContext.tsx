@@ -47,8 +47,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string) => {
     // Mock success for development when Supabase isn't configured
     if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL.includes('your-project')) {
+      // Create consistent user ID based on email for demo purposes
+      const mockUser = { id: `user_${btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10)}`, email };
       return { 
-        data: { user: { id: 'mock-user', email }, session: null }, 
+        data: { user: mockUser, session: null }, 
         error: null 
       };
     }
@@ -63,7 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     // Mock success for development when Supabase isn't configured
     if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL.includes('your-project')) {
-      const mockUser = { id: 'mock-user', email };
+      // Create consistent user ID based on email for demo purposes
+      const mockUser = { id: `user_${btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10)}`, email };
       const mockSession = { user: mockUser, access_token: 'mock-token' };
       setUser(mockUser as any);
       setSession(mockSession as any);
