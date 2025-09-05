@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Accessibility Classes */
+.high-contrast {
+  --tw-bg-opacity: 1;
+  filter: contrast(150%) brightness(120%);
+}
+
+.high-contrast .bg-white {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.high-contrast .text-gray-900,
+.high-contrast .text-gray-800,
+.high-contrast .text-gray-700,
+.high-contrast .text-gray-600 {
+  color: #ffffff !important;
+}
+
+.high-contrast .bg-gray-50,
+.high-contrast .bg-gray-100 {
+  background-color: #1f1f1f !important;
+}
+
+.high-contrast .border-gray-200,
+.high-contrast .border-gray-100 {
+  border-color: #444444 !important;
+}
+
+.large-text * {
+  font-size: 1.25em !important;
+  line-height: 1.6 !important;
+}
+
+.large-text button,
+.large-text input,
+.large-text textarea {
+  min-height: 60px !important;
+  padding: 1rem !important;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus Styles for Accessibility */
+*:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Voice Input Animation */
+@keyframes voice-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+.voice-listening {
+  animation: voice-pulse 1.5s ease-in-out infinite;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #3b82f6, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Loading Animation */
+@keyframes loading-bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+.loading-dot {
+  animation: loading-bounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dot:nth-child(1) { animation-delay: -0.32s; }
+.loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+/* Parallax Container */
+.parallax-container {
+  transform-style: preserve-3d;
+}
+
+/* Touch Targets */
+@media (max-width: 768px) {
+  button, 
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* High Contrast Colors Override */
+.high-contrast .bg-blue-600 {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.high-contrast .bg-green-600 {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.high-contrast .text-blue-600,
+.high-contrast .text-green-600,
+.high-contrast .text-purple-600 {
+  color: #ffffff !important;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  * {
+    background: white !important;
+    color: black !important;
+  }
+}
