@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, Heart } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Heart, Mic } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { VoiceLoginInput } from '../ui/VoiceLoginInput';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const AuthForm: React.FC = () => {
@@ -11,6 +12,9 @@ export const AuthForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [useVoiceMode, setUseVoiceMode] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [currentVoiceField, setCurrentVoiceField] = useState<'email' | 'password' | 'none'>('none');
 
   const { signUp, signIn } = useAuth();
 
@@ -56,6 +60,75 @@ export const AuthForm: React.FC = () => {
     }
   };
 
+  // Simulated voice recognition functions
+  const startVoiceRecognition = () => {
+    setIsListening(true);
+    setCurrentVoiceField('none');
+    
+    // Simulate voice command recognition
+    setTimeout(() => {
+      // This would be replaced with actual speech recognition
+      simulateVoiceCommand();
+    }, 2000);
+  };
+
+  const stopVoiceRecognition = () => {
+    setIsListening(false);
+    setCurrentVoiceField('none');
+  };
+
+  const simulateVoiceCommand = () => {
+    // Simulate different voice commands for demo
+    const commands = ['email', 'password', 'login'];
+    const randomCommand = commands[Math.floor(Math.random() * commands.length)];
+    
+    switch (randomCommand) {
+      case 'email':
+        setCurrentVoiceField('email');
+        setTimeout(() => {
+          setEmail('demo@example.com');
+          setCurrentVoiceField('none');
+        }, 3000);
+        break;
+      case 'password':
+        setCurrentVoiceField('password');
+        setTimeout(() => {
+          setPassword('demopassword123');
+          setCurrentVoiceField('none');
+        }, 3000);
+        break;
+      case 'login':
+        if (email && password) {
+          handleSubmit(new Event('submit') as any);
+        }
+        setIsListening(false);
+        break;
+    }
+  };
+
+  const handleVoiceEmailCapture = (capturedEmail: string) => {
+    setEmail(capturedEmail);
+  };
+
+  const handleVoicePasswordCapture = (capturedPassword: string) => {
+    setPassword(capturedPassword);
+  };
+
+  const handleVoiceSubmit = () => {
+    if (email && password) {
+      handleSubmit(new Event('submit') as any);
+    }
+    setIsListening(false);
+  };
+
+  const toggleVoiceListening = () => {
+    if (isListening) {
+      stopVoiceRecognition();
+    } else {
+      startVoiceRecognition();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
       <motion.div
@@ -80,6 +153,21 @@ export const AuthForm: React.FC = () => {
           <p className="text-gray-600">
             Personalized fitness for everyone, everywhere
           </p>
+          
+          {/* Voice Mode Toggle */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setUseVoiceMode(!useVoiceMode)}
+            className={`mt-4 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+              useVoiceMode 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <Mic size={16} className="inline mr-2" />
+            {useVoiceMode ? 'Voice Mode Active' : 'Enable Voice Mode'}
+          </motion.button>
         </div>
 
         {/* Auth Form */}
@@ -90,54 +178,83 @@ export const AuthForm: React.FC = () => {
           className="bg-white rounded-3xl shadow-xl p-8"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Input */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-            </div>
+            {useVoiceMode ? (
+              /* Voice Input Mode */
+              <VoiceLoginInput
+                onEmailCapture={handleVoiceEmailCapture}
+                onPasswordCapture={handleVoicePasswordCapture}
+                onSubmit={handleVoiceSubmit}
+                isListening={isListening}
+                onToggleListening={toggleVoiceListening}
+                currentField={currentVoiceField}
+                email={email}
+                password={password}
+                showPassword={showPassword}
+                onTogglePasswordVisibility={() => setShowPassword(!showPassword)}
+              />
+            ) : (
+              /* Traditional Input Mode */
+              <>
+                {/* Email Input */}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
+                      placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+                </div>
 
-            {/* Password Input */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
-                  placeholder="Enter your password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  aria-label="Toggle password visibility"
+                {/* Password Input */}
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
+                      placeholder="Enter your password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      aria-label="Toggle password visibility"
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={loading}
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
+                  {loading ? 'Please wait...' : (isSignUp ? 'Create Account' : 'Sign In')}
+                </Button>
+              </>
+            )}
 
             {/* Error Message */}
-            {error && (
+            {error && !useVoiceMode && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -147,26 +264,18 @@ export const AuthForm: React.FC = () => {
               </motion.div>
             )}
 
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              className="w-full"
-              size="lg"
-              disabled={loading}
-            >
-              {loading ? 'Please wait...' : (isSignUp ? 'Create Account' : 'Sign In')}
-            </Button>
-
             {/* Toggle Mode */}
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-              >
-                {isSignUp ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
-              </button>
-            </div>
+            {!useVoiceMode && (
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                >
+                  {isSignUp ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
+                </button>
+              </div>
+            )}
           </form>
         </motion.div>
 
@@ -178,7 +287,10 @@ export const AuthForm: React.FC = () => {
           className="text-center mt-6 text-sm text-gray-600"
         >
           <p>✨ Designed with accessibility in mind</p>
-          <p>Voice control, high contrast, and more features available</p>
+          <p>
+            {useVoiceMode ? '🎤 Voice control active' : 'Voice control available'}, 
+            high contrast, and more accessibility features
+          </p>
         </motion.div>
       </motion.div>
     </div>
