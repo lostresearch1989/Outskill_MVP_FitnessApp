@@ -154,9 +154,6 @@ function AppContent() {
       localStorage.setItem(`progress_${user.id}`, JSON.stringify(progressEntries));
     }
   }, [user, progressEntries]);
-      }
-    }
-  }, [user]);
 
   const handleOnboardingComplete = (data: any) => {
     const profile: User = {
@@ -214,6 +211,7 @@ function AppContent() {
       new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime()
     );
     setProgressEntries(updatedEntries);
+    localStorage.setItem(`progress_${user!.id}`, JSON.stringify(updatedEntries));
   };
 
   const handleUpdateMilestone = (milestoneIndex: number, completed: boolean) => {
@@ -223,6 +221,7 @@ function AppContent() {
     updatedPlan.milestones[milestoneIndex].completed = completed;
     updatedPlan.milestones[milestoneIndex].completed_at = completed ? new Date().toISOString() : undefined;
     
+    localStorage.setItem(`plan_${user!.id}`, JSON.stringify(updatedPlan));
     setPersonalizedPlan(updatedPlan);
   };
 
