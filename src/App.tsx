@@ -184,16 +184,19 @@ function AppContent() {
   };
 
   const handleSaveBaseline = (baselineData: BaselineData) => {
+    localStorage.setItem(`baseline_${user!.id}`, JSON.stringify(baselineData));
     setBaseline(baselineData);
     setShowBaselineAssessment(false);
   };
 
   const handleSaveTargets = (targetsData: FitnessTargets) => {
+    localStorage.setItem(`targets_${user!.id}`, JSON.stringify(targetsData));
     setFitnessTargets(targetsData);
     
     // Generate personalized plan if we have baseline data
     if (baseline) {
       const plan = generatePersonalizedPlan(baseline, targetsData, userProfile?.disability_type);
+      localStorage.setItem(`plan_${user!.id}`, JSON.stringify(plan));
       setPersonalizedPlan(plan);
     }
     
@@ -211,6 +214,7 @@ function AppContent() {
       new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime()
     );
     setProgressEntries(updatedEntries);
+    localStorage.setItem(`progress_${user!.id}`, JSON.stringify(updatedEntries));
   };
 
   const handleUpdateMilestone = (milestoneIndex: number, completed: boolean) => {
@@ -220,6 +224,7 @@ function AppContent() {
     updatedPlan.milestones[milestoneIndex].completed = completed;
     updatedPlan.milestones[milestoneIndex].completed_at = completed ? new Date().toISOString() : undefined;
     
+    localStorage.setItem(`plan_${user!.id}`, JSON.stringify(updatedPlan));
     setPersonalizedPlan(updatedPlan);
   };
 
