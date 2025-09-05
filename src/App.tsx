@@ -211,7 +211,6 @@ function AppContent() {
       new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime()
     );
     setProgressEntries(updatedEntries);
-    localStorage.setItem(`progress_${user!.id}`, JSON.stringify(updatedEntries));
   };
 
   const handleUpdateMilestone = (milestoneIndex: number, completed: boolean) => {
