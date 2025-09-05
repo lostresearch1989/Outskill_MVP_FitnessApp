@@ -220,7 +220,6 @@ function AppContent() {
     updatedPlan.milestones[milestoneIndex].completed = completed;
     updatedPlan.milestones[milestoneIndex].completed_at = completed ? new Date().toISOString() : undefined;
     
-    localStorage.setItem(`plan_${user!.id}`, JSON.stringify(updatedPlan));
     setPersonalizedPlan(updatedPlan);
   };
 
