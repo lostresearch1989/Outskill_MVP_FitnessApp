@@ -91,7 +91,6 @@ export const AuthForm: React.FC = () => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: 'spring' }}
-              {useVoiceMode ? '🎤 Voice control active' : '🎤 Voice control available'}, 
           >
             <Heart size={40} className="text-white" />
           </motion.div>
