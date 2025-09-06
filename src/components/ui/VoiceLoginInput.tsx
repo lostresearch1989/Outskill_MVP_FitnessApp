@@ -29,20 +29,102 @@ export const VoiceLoginInput: React.FC<VoiceLoginInputProps> = ({
   onTogglePasswordVisibility,
 }) => {
   const [voiceInstructions, setVoiceInstructions] = useState('');
+  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognitionInstance = new SpeechRecognition();
+      
+      recognitionInstance.continuous = false;
+      recognitionInstance.interimResults = false;
+      recognitionInstance.lang = 'en-US';
+      
+      recognitionInstance.onresult = (event) => {
+        const result = event.results[0][0].transcript.toLowerCase();
+        handleVoiceCommand(result);
+      };
+      
+      recognitionInstance.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        // Fallback to demo simulation
+        simulateVoiceCommand();
+      };
+      
+      recognitionInstance.onend = () => {
+        if (isListening) {
+          // Restart listening if we're still in listening mode
+          setTimeout(() => {
+            if (isListening) {
+              try {
+                recognitionInstance.start();
+              } catch (error) {
+                console.error('Failed to restart recognition:', error);
+              }
+            }
+          }, 100);
+        }
+      };
+      
+      setRecognition(recognitionInstance);
+    }
+  }, []);
+
+  const handleVoiceCommand = (command: string) => {
+    console.log('Voice command received:', command);
+    
+    if (command.includes('email')) {
+      // Simulate email capture
+      setTimeout(() => {
+        onEmailCapture('demo@adaptmaxfit.com');
+      }, 1000);
+    } else if (command.includes('password')) {
+      // Simulate password capture
+      setTimeout(() => {
+        onPasswordCapture('demo123');
+      }, 1000);
+    } else if (command.includes('login') || command.includes('sign in')) {
+      onSubmit();
+    } else if (command.includes('show password')) {
+      onTogglePasswordVisibility();
+    } else if (command.includes('clear email')) {
+      onEmailCapture('');
+    } else if (command.includes('clear password')) {
+      onPasswordCapture('');
+    }
+  };
+
+  const simulateVoiceCommand = () => {
+    // Fallback simulation
+    setTimeout(() => {
+      const commands = ['email', 'password', 'login'];
+      const randomCommand = commands[Math.floor(Math.random() * commands.length)];
+      handleVoiceCommand(randomCommand);
+    }, 2000);
+  };
 
   useEffect(() => {
     if (isListening) {
-      if (currentField === 'email') {
-        setVoiceInstructions('Say your email address clearly...');
-      } else if (currentField === 'password') {
-        setVoiceInstructions('Say your password clearly...');
+      setVoiceInstructions('Say "email", "password", "login", or other commands...');
+      
+      if (recognition) {
+        try {
+          recognition.start();
+        } catch (error) {
+          console.error('Failed to start speech recognition:', error);
+          simulateVoiceCommand();
+        }
       } else {
-        setVoiceInstructions('Say "email" to enter email, "password" to enter password, or "login" to sign in...');
+        simulateVoiceCommand();
       }
     } else {
       setVoiceInstructions('');
+      if (recognition) {
+        recognition.stop();
+      }
     }
-  }, [isListening, currentField]);
+  }, [isListening, recognition]);
 
   const getVoiceCommands = () => {
     return [

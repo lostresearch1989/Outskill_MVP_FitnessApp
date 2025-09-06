@@ -16,12 +16,42 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
 }) => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
 
-  // Simulate voice recognition (in a real app, you'd use Web Speech API)
-  const startListening = () => {
-    setIsListening(true);
-    
-    // Simulate listening for 3 seconds
+  // Initialize speech recognition
+  React.useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognitionInstance = new SpeechRecognition();
+      
+      recognitionInstance.continuous = false;
+      recognitionInstance.interimResults = false;
+      recognitionInstance.lang = 'en-US';
+      
+      recognitionInstance.onresult = (event) => {
+        const result = event.results[0][0].transcript;
+        setTranscript(result);
+        onTranscript(result);
+        setIsListening(false);
+      };
+      
+      recognitionInstance.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        // Fallback to demo mode if speech recognition fails
+        simulateVoiceRecognition();
+      };
+      
+      recognitionInstance.onend = () => {
+        setIsListening(false);
+      };
+      
+      setRecognition(recognitionInstance);
+    }
+  }, [onTranscript]);
+
+  // Fallback simulation for browsers without speech recognition
+  const simulateVoiceRecognition = () => {
     setTimeout(() => {
       const exampleTranscripts = [
         "Did 15 minutes of wheelchair cardio today, feeling good",
@@ -38,8 +68,27 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
     }, 3000);
   };
 
+  const startListening = () => {
+    setIsListening(true);
+    
+    if (recognition) {
+      try {
+        recognition.start();
+      } catch (error) {
+        console.error('Failed to start speech recognition:', error);
+        simulateVoiceRecognition();
+      }
+    } else {
+      // Fallback to simulation if speech recognition is not available
+      simulateVoiceRecognition();
+    }
+  };
+
   const stopListening = () => {
     setIsListening(false);
+    if (recognition) {
+      recognition.stop();
+    }
   };
 
   return (

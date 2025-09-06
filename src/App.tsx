@@ -244,7 +244,7 @@ function AppContent() {
           <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <div className="w-8 h-8 bg-white rounded-full" />
           </div>
-          <p className="text-gray-600">Loading AdaptFit...</p>
+          <p className="text-gray-600">Loading AdaptMaxFit...</p>
         </div>
       </div>
     );

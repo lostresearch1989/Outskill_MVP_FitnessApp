@@ -60,52 +60,6 @@ export const AuthForm: React.FC = () => {
     }
   };
 
-  // Simulated voice recognition functions
-  const startVoiceRecognition = () => {
-    setIsListening(true);
-    setCurrentVoiceField('none');
-    
-    // Simulate voice command recognition
-    setTimeout(() => {
-      // This would be replaced with actual speech recognition
-      simulateVoiceCommand();
-    }, 2000);
-  };
-
-  const stopVoiceRecognition = () => {
-    setIsListening(false);
-    setCurrentVoiceField('none');
-  };
-
-  const simulateVoiceCommand = () => {
-    // Simulate different voice commands for demo
-    const commands = ['email', 'password', 'login'];
-    const randomCommand = commands[Math.floor(Math.random() * commands.length)];
-    
-    switch (randomCommand) {
-      case 'email':
-        setCurrentVoiceField('email');
-        setTimeout(() => {
-          setEmail('demo@example.com');
-          setCurrentVoiceField('none');
-        }, 3000);
-        break;
-      case 'password':
-        setCurrentVoiceField('password');
-        setTimeout(() => {
-          setPassword('demopassword123');
-          setCurrentVoiceField('none');
-        }, 3000);
-        break;
-      case 'login':
-        if (email && password) {
-          handleSubmit(new Event('submit') as any);
-        }
-        setIsListening(false);
-        break;
-    }
-  };
-
   const handleVoiceEmailCapture = (capturedEmail: string) => {
     setEmail(capturedEmail);
   };
@@ -118,15 +72,10 @@ export const AuthForm: React.FC = () => {
     if (email && password) {
       handleSubmit(new Event('submit') as any);
     }
-    setIsListening(false);
   };
 
   const toggleVoiceListening = () => {
-    if (isListening) {
-      stopVoiceRecognition();
-    } else {
-      startVoiceRecognition();
-    }
+    setIsListening(!isListening);
   };
 
   return (
@@ -142,16 +91,16 @@ export const AuthForm: React.FC = () => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: 'spring' }}
-            className="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-3xl mb-6"
+              {useVoiceMode ? '🎤 Voice control active' : '🎤 Voice control available'}, 
           >
             <Heart size={40} className="text-white" />
           </motion.div>
           
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome to AdaptFit
+            Welcome to AdaptMaxFit
           </h1>
           <p className="text-gray-600">
-            Personalized fitness for everyone, everywhere
+            Maximize Your Potential, Adapt Your Way
           </p>
           
           {/* Voice Mode Toggle */}

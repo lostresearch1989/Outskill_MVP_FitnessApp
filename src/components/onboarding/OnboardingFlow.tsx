@@ -135,7 +135,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) =>
               {currentStep === 0 && (
                 <div className="text-center space-y-6">
                   <p className="text-lg text-gray-700">
-                    AdaptFit is designed specifically for people with disabilities and chronic conditions. 
+                    AdaptMaxFit is designed specifically for people with disabilities and chronic conditions. 
                     We'll help you discover safe, effective workouts tailored to your unique needs.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
